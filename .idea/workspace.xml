@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="46a80c92-3124-412f-a33c-7912f3b7e240" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/server.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/web.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/.python-version" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/db.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/ingest/pdf.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/ingest/split.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/ingest/types.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/llm.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/migrate.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/models.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/prompts/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/prompts/concepts.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/prompts/diagnosis.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/prompts/grade.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/prompts/lesson.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/prompts/quiz.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/routers/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/routers/books.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/routers/days.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/routers/diagnosis.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/schemas.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/services/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/services/books.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/services/jobs.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/services/memory.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/services/study.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/app/views.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/pyproject.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/scripts/migrate_to_per_user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/scripts/smoke.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/tests/conftest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/tests/test_api.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/tests/test_auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/tests/test_memory.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/tests/test_migrate.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/tests/test_pdf.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/tests/test_split.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/uv.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/.env.development" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/.env.production" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/babel.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/config/dev.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/config/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/config/prod.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/pnpm-lock.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/pnpm-workspace.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/project.config.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/app.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/app.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/app.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/components/Markdown.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/components/QuestionCard.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/components/QuestionCard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/components/RequireAuth.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/components/TicketHandler.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/models/types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/book/index.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/book/index.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/book/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/diagnosis/index.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/diagnosis/index.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/diagnosis/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/library/index.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/library/index.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/library/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/study/index.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/study/index.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/pages/study/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/services/api.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/services/authApi.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/services/request.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/styles/theme.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/utils/authStorage.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/utils/markdown.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/src/utils/sso.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/types/global.d.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="GOROOT" url="file:///opt/homebrew/opt/go/libexec" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3KPrJfRwh5spwK5hfFoBc1bvfwL" />
+  <component name="ProjectViewState">
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.GoLinterPluginOnboardingV2": "true",
+    "RunOnceActivity.GoLinterPluginStorageMigration": "true",
+    "RunOnceActivity.GoOptimizationToolWindowEnableInLayout.v333333": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.analysis.ui.options.defaults": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "/Users/weiweigod/codes/learn-daily",
+    "nodejs_package_manager_path": "pnpm",
+    "ts.external.directory.path": "/Users/weiweigod/codes/learn-daily/web/node_modules/typescript/lib"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-63c95d513abe-08e7ff217c2b-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-262.10968.67" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-GO-262.10968.67" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="46a80c92-3124-412f-a33c-7912f3b7e240" name="更改" comment="" />
+      <created>1791469973820</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1791469973820</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

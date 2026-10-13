@@ -1,0 +1,57 @@
+{
+  "name": "learn-daily-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "learn-daily 前端：按天学一本书",
+  "templateInfo": {
+    "name": "react-NutUI",
+    "typescript": true,
+    "css": "Less",
+    "framework": "React"
+  },
+  "scripts": {
+    "build:h5": "taro build --type h5",
+    "build:weapp": "taro build --type weapp",
+    "dev:h5": "npm run build:h5 -- --watch",
+    "dev:weapp": "npm run build:weapp -- --watch"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.21.5",
+    "@nutui/nutui-react-taro": "^2.6.14",
+    "@tarojs/components": "4.1.11",
+    "@tarojs/helper": "4.1.11",
+    "@tarojs/plugin-framework-react": "4.1.11",
+    "@tarojs/plugin-html": "4.1.11",
+    "@tarojs/plugin-platform-h5": "4.1.11",
+    "@tarojs/plugin-platform-weapp": "4.1.11",
+    "@tarojs/react": "4.1.11",
+    "@tarojs/runtime": "4.1.11",
+    "@tarojs/shared": "4.1.11",
+    "@tarojs/taro": "4.1.11",
+    "ahooks": "^3.10.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.0",
+    "@babel/preset-react": "^7.24.1",
+    "@tarojs/cli": "4.1.11",
+    "@tarojs/vite-runner": "4.1.11",
+    "@types/react": "^18.0.0",
+    "@vitejs/plugin-react": "^4.1.0",
+    "babel-plugin-import": "^1.13.8",
+    "babel-preset-taro": "4.1.11",
+    "less": "^4.1.3",
+    "postcss": "^8.4.18",
+    "react-refresh": "^0.11.0",
+    "terser": "^5.16.8",
+    "typescript": "^5.1.0",
+    "vite": "^4.2.0",
+    "vite-plugin-imp": "^2.4.0"
+  }
+}

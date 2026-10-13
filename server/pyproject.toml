@@ -1,0 +1,26 @@
+[project]
+name = "learn-daily"
+version = "0.1.0"
+description = "把一本书切成每天一课：讲解 → 出题 → 批改"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.142.2",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.15.0",
+    "pyjwt[crypto]>=2.15.1",
+    "pymupdf>=1.28.2",
+    "python-multipart>=0.0.32",
+    "sqlmodel>=0.0.47",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+# app/ 不是安装进来的包，得让 pytest 把项目根放进 sys.path
+pythonpath = ["."]
+testpaths = ["tests"]

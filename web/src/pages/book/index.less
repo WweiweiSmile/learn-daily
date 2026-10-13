@@ -1,0 +1,51 @@
+@import '../../styles/theme.less';
+
+.title {
+  display: block;
+  font-size: @font-size-xl;
+  font-weight: 600;
+  margin-bottom: @space-xs;
+}
+
+.warning {
+  display: block;
+  margin-top: @space-xs;
+  color: @warning;
+  font-size: @font-size-sm;
+  line-height: 1.7;
+}
+
+.continue {
+  margin-top: @space-md;
+}
+
+.day {
+  padding: @space-md @space-lg;
+}
+
+.day-done {
+  opacity: 0.6;
+}
+
+.day-index {
+  font-size: @font-size-sm;
+  color: @text-secondary;
+}
+
+/* 不能叫 .day-title —— 学习页已经用了这个名字，同名会同时命中两个页面的元素 */
+.day-card-title {
+  display: block;
+  font-size: @font-size-md;
+  font-weight: 500;
+  margin: @space-xs 0;
+}
+
+.tag-done {
+  color: @success;
+  font-size: @font-size-sm;
+}
+
+.tag-pending {
+  color: @text-secondary;
+  font-size: @font-size-sm;
+}

@@ -1,0 +1,12 @@
+# pnpm 默认拦下依赖的 postinstall 脚本。这里显式列出来关掉，否则 pnpm run
+# 的依赖检查会直接以 ERR_PNPM_IGNORED_BUILDS 失败。
+# 这些包不跑脚本也能正常工作：esbuild/swc 的二进制走平台相关的 optional dep。
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
+  '@tarojs/binding': false
+  '@tarojs/cli': false
+  core-js: false
+  core-js-pure: false
+  esbuild: false
+  less: false

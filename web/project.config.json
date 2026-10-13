@@ -1,0 +1,27 @@
+{
+  "miniprogramRoot": "dist/",
+  "projectname": "learn-daily",
+  "description": "按天学一本书",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false,
+    "newFeature": true,
+    "autoAudits": false,
+    "useCompilerModule": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "simulatorType": "wechat",
+  "condition": {},
+  "packOptions": { "ignore": [], "include": [] },
+  "editorSetting": {}
+}

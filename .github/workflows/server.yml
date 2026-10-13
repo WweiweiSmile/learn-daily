@@ -1,0 +1,114 @@
+# learn-daily 服务端（FastAPI）的构建与部署。
+#
+# 结构照搬 call-back 的 .github/workflows/go.yml：上传产物 → ssh 重启 systemd 服务，
+# 用同一套 secrets 名字（SERVER_HOST / SERVER_USERNAME / SERVER_PASSWORD）。
+# Python 这边的"装依赖"与"找服务"两段参考 poker-ocr 的 python.yml —— 一个裸的
+# systemctl restart 只会换成代码、不装新依赖，加了包的那次上线会在服务器上直接崩。
+#
+# 刻意不跑 test，与 call-back / call-front 一致：这条流水线只负责"把代码送上线"。
+# 代价要知道：它只能证明"传上去了"，证明不了行为正确 —— 好在 server 的 37 个测试
+# 全部打桩、不花钱，合并到 main 前本地跑一次 `uv run pytest -q` 即可。若要接进 CI，
+# 那是同一个 job 里的额外 step，不额外消耗 job 数。
+#
+# 刻意**不加 pull_request**：这条流水线不构建也不测试，PR 上跑一次什么都验证不了，
+# 只是白烧分钟数（call-auth 的 go.yml 里已就此写过注记）。
+#
+# ⚠️ 本仓库是 server/ + web/ 单仓，所以触发条件带 paths 过滤：只改 web 不会触发这条。
+#
+# ⚠️ 部署参数按 call-back 的写法平移，上线前请核对服务器实际情况：
+#      target 目录 / 端口 / 服务名。服务器上还需要一份自己的 .env（见 .env.example，
+#      真 key 在 .env 里、已 gitignore，不会随流水线上传）和一个可写的 data/ 目录。
+
+name: Server
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "server/**"
+      - ".github/workflows/server.yml"
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 读取仓库内容
+        uses: actions/checkout@v4
+
+      - name: 上传源码
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          # 只传跑起来需要的东西。tests/ 与 .env.example 不进生产
+          source: "server/app/,server/pyproject.toml,server/uv.lock,server/scripts/"
+          # strip_components: 1 剥掉开头的 server/，于是落到目标目录里是
+          # app/ pyproject.toml uv.lock scripts/（而不是 server/app/...）
+          strip_components: 1
+          target: "/www/wwwroot/learn-back"
+
+      - name: 部署
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          debug: true
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          script: |
+            set -e
+            cd /www/wwwroot/learn-back
+
+            # ── 1. uv：本项目用 uv 管理依赖与 .venv ──────────────────────
+            if ! command -v uv >/dev/null 2>&1; then
+              echo "❌ 服务器上没有 uv。先装一次：curl -LsSf https://astral.sh/uv/install.sh | sh"
+              exit 1
+            fi
+
+            # ── 2. 依赖：uv.lock 没变就跳过 uv sync ─────────────────────
+            STAMP=.uv.sha256
+            NEW=$(sha256sum uv.lock | awk '{print $1}')
+
+            # 哈希一致还不够：.venv 可能被删过或换过位置，所以顺带确认解释器还在
+            if [ "$NEW" = "$(cat "$STAMP" 2>/dev/null || true)" ] && [ -x .venv/bin/uvicorn ]; then
+              echo "✅ uv.lock 未变化，跳过 uv sync"
+            else
+              echo "⬆️  依赖有变化或 .venv 缺失，执行 uv sync --frozen"
+              uv sync --frozen
+              echo "$NEW" > "$STAMP"   # 装成功才落盘，失败了下一次还会重试
+            fi
+
+            # ── 3. 找服务：先按端口 8010 反查，反查不到再按名字 ──────────
+            # 按名字找不可靠：unit 叫什么全看宝塔怎么命名；而且服务处于 failed 状态时
+            # list-units 会在行首多打一个 ●，被 awk 当成第一个字段，grep 就匹配不到了。
+            # 服务在跑的时候端口一定是通的，从端口反查最稳。
+            SVC=""
+            PID=$(ss -ltnp 'sport = :8010' 2>/dev/null \
+                  | sed -n 's/.*pid=\([0-9]*\).*/\1/p' | head -n1)
+            if [ -n "$PID" ]; then
+              echo "8010 端口进程 PID: $PID"
+              SVC=$(grep -oE '[^/]+\.service' "/proc/$PID/cgroup" 2>/dev/null | head -n1 || true)
+            fi
+
+            if [ -z "$SVC" ]; then
+              # 服务没在跑（端口空）时兜底：按名字找，并剥掉行首的 ● 和空格
+              SVC=$(systemctl list-units --type=service --all --plain --no-legend --no-pager 2>/dev/null \
+                    | sed 's/^[^[:alnum:]]*//' | awk '{print $1}' \
+                    | grep -iE 'learn' | head -n1 || true)
+            fi
+
+            # ── 4. 重启并确认真的起来了 ────────────────────────────────
+            if [ -n "$SVC" ]; then
+              # 反复 boot 失败会把 unit 打成 failed 并触发 systemd 的启动限流，
+              # 这时 restart 会被直接拒掉，所以先清一次失败状态
+              systemctl reset-failed "$SVC" 2>/dev/null || true
+              systemctl restart "$SVC"
+              sleep 3
+              systemctl is-active "$SVC"
+              echo "✅ 已重启 $SVC"
+            else
+              echo "⚠️  没找到服务名，跳过重启。依赖已处理好，去面板手动重启一次即可。"
+            fi

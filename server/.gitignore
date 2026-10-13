@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# 真 key 只在这里，永远不要提交
+.env
+
+# 上传的书和 SQLite 库
+data/
+
+.pytest_cache/

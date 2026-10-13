@@ -1,0 +1,92 @@
+# learn-daily 前端（Taro4 + React，H5）的构建与部署。
+#
+# 结构照搬 call-front 的 .github/workflows/front.yml：pnpm 构建 → scp dist → reload，
+# 用同一套 secrets 名字（SERVER_HOST / SERVER_USERNAME / SERVER_PASSWORD）。
+#
+# 与 call-front 的两处必要差异：
+#
+#   1. 本仓库是 server/ + web/ 单仓，所以 pnpm 命令要进 web/ 目录跑、scp 传 ./web/dist，
+#      且触发条件带 paths 过滤（只改 server 不会触发这条）。
+#
+#   2. call-front 的部署步骤没有 if 守卫，**同仓库分支的 PR 会直接部署上线**
+#      （call-auth 的 go.yml 里已就此写过注记）。这里给部署那两步加了
+#      `if: github.event_name == 'push'`：PR 只构建、不部署。
+#
+# ⚠️ 部署参数按 call-front 的写法平移，上线前请核对服务器实际情况：target 目录 / 站点根。
+
+name: Web
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "web/**"
+      - ".github/workflows/web.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "web/**"
+      - ".github/workflows/web.yml"
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: 读取仓库内容
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          # 与 call-front 同版本。锁文件 lockfileVersion 是 9.0，pnpm 10 正好
+          version: 10.30.3
+
+      - name: 设置 node 版本
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: 下载依赖
+        # --frozen-lockfile：CI 里锁文件与 package.json 对不上就直接失败，
+        # 而不是顺手改锁文件 —— 那会让"本地能跑、线上装的却不一样"
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建项目
+        run: pnpm run build:h5
+
+      - name: 上传构建目录
+        if: github.event_name == 'push'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          source: "./web/dist"
+          # strip_components: 1 剥掉开头的 web/，站点根就是 <target>/dist
+          strip_components: 1
+          target: "/www/wwwroot/learn-front"
+
+      - name: 部署
+        if: github.event_name == 'push'
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          debug: true
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          script: |
+            # 纯静态站点：dist 已经 scp 到位，让 web 服务器重读即可。
+            # 本机是 nginx 就用这行；若这台机器是 Caddy（见 web/.env.production 里
+            # "Caddy 把 /api 反代到 :8010" 的说明），把这行换成：systemctl reload caddy
+            #
+            # 注意：config/index.ts 把 h5 路由设成了 history 模式，nginx 站点要配
+            # `try_files $uri $uri/ /index.html;` 回落，否则刷新/直达会 404
+            nginx -s reload

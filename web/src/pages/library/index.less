@@ -1,0 +1,93 @@
+@import '../../styles/theme.less';
+
+.header {
+  padding: @space-xs @space-xs @space-md;
+}
+
+.header-title {
+  font-size: @font-size-xxl;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  gap: @space-lg;
+}
+
+.header-action {
+  color: @primary;
+  font-size: @font-size-base;
+}
+
+.actions {
+  display: flex;
+  gap: @space-sm;
+  margin-bottom: @space-md;
+}
+
+.book-title {
+  font-size: @font-size-md;
+  font-weight: 600;
+  flex: 1;
+  margin-right: @space-sm;
+}
+
+.delete {
+  color: #b0b5bb;
+  font-size: @font-size-sm;
+}
+
+.progress {
+  height: 4px;
+  background: @line;
+  border-radius: 2px;
+  margin: @space-sm 0 @space-xs;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: @primary;
+  border-radius: 2px;
+}
+
+.book-error {
+  display: block;
+  margin-top: @space-xs;
+  color: @danger;
+  font-size: @font-size-sm;
+  line-height: 1.7;
+}
+
+.book-warning {
+  display: block;
+  margin-top: @space-xs;
+  color: @warning;
+  font-size: @font-size-sm;
+  line-height: 1.7;
+}
+
+.paste {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.paste-title {
+  width: 100%;
+  border: 1px solid @border;
+  border-radius: @radius;
+  padding: @space-sm;
+  margin-bottom: @space-sm;
+  font-size: @font-size-base;
+}
+
+.paste-body {
+  flex: 1;
+  width: 100%;
+  border: 1px solid @border;
+  border-radius: @radius;
+  padding: @space-sm;
+  margin-bottom: @space-md;
+  font-size: @font-size-base;
+}

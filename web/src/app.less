@@ -1,0 +1,152 @@
+@import './styles/theme.less';
+
+// NutUI 的 type="primary" 按钮底色是个写死的红色渐变（stop-1 #f53d4d → stop-2 #fa2c19），
+// 不是从 --nutui-color-primary 取的，所以只改主题色没用，必须改这两个 stop。
+// call-front 里「主按钮全站是红的」就是这个原因。
+// 这里还有一个语义问题：红在这个应用里表示「答错了 / 偏离了」，主按钮再用红就撞了。
+page,
+:root {
+  --nutui-color-primary: @primary;
+  --nutui-color-primary-stop-1: #3c82c9;
+  --nutui-color-primary-stop-2: @primary;
+  --nutui-color-primary-pressed: #24598f;
+  --nutui-color-primary-disabled: #a8c3de;
+  --nutui-color-primary-light: @primary-soft;
+}
+
+page {
+  background-color: @bg-page;
+  color: @text-primary;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  font-size: @font-size-base;
+  line-height: 1.7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.page {
+  min-height: 100vh;
+  padding: @space-lg @space-lg @space-xl;
+}
+
+.card {
+  background: @bg-card;
+  border-radius: @radius-lg;
+  padding: @space-lg;
+  margin-bottom: @space-md;
+}
+
+.card-title {
+  font-size: @font-size-lg;
+  font-weight: 600;
+  margin-bottom: @space-sm;
+}
+
+.muted {
+  color: @text-secondary;
+  font-size: @font-size-sm;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: @text-secondary;
+}
+
+// 跨页面共用的类一律放这里。Taro H5 是把各页面的样式全局注入的，
+// 两个页面各写一份同名类会互相覆盖，而且谁赢取决于加载顺序。
+.error {
+  display: block;
+  color: @danger;
+  font-size: @font-size-sm;
+  line-height: 1.7;
+}
+
+// 长正文：保留原文里的换行
+.prose {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: @font-size-base;
+  line-height: 1.8;
+}
+
+/* ---------- Markdown 渲染 ---------- */
+/* 模型吐出来的是 Markdown，见 components/Markdown.tsx */
+
+.md-p {
+  margin: 0 0 @space-md;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.8;
+}
+
+.md-h {
+  font-weight: 600;
+  margin: @space-lg 0 @space-sm;
+  color: @text-primary;
+}
+
+.md-h1 {
+  font-size: 18px;
+}
+.md-h2 {
+  font-size: @font-size-lg;
+}
+.md-h3 {
+  font-size: @font-size-md;
+}
+.md-h4 {
+  font-size: @font-size-base;
+  color: @text-tertiary;
+}
+
+.md-bold {
+  font-weight: 600;
+}
+
+.md-list {
+  margin: 0 0 @space-md;
+}
+
+.md-li {
+  display: flex;
+  margin-bottom: @space-xs;
+}
+
+.md-marker {
+  flex: none;
+  width: 22px;
+  color: @text-secondary;
+}
+
+.md-li-text {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.md-code {
+  background: #f2f3f5;
+  border-radius: @radius-sm;
+  padding: @space-md;
+  margin: 0 0 @space-md;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: @font-size-sm;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

@@ -1,0 +1,152 @@
+@import '../styles/theme.less';
+
+.q {
+  border-top: 1px solid @line;
+  padding-top: @space-lg;
+  margin-top: @space-lg;
+
+  &:first-child {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+}
+
+.q-head {
+  display: flex;
+  align-items: center;
+  gap: @space-sm;
+  margin-bottom: @space-xs;
+}
+
+.q-index {
+  font-size: @font-size-sm;
+  color: @text-secondary;
+}
+
+.q-kind {
+  font-size: @font-size-xs;
+  color: @primary;
+  background: @primary-soft;
+  border-radius: @radius-sm;
+  padding: 2px 7px;
+}
+
+.q-stem {
+  display: block;
+  font-size: @font-size-md;
+  line-height: 1.7;
+  margin-bottom: @space-md;
+}
+
+.q-options {
+  margin-bottom: @space-md;
+}
+
+.q-option {
+  border: 1px solid @border;
+  border-radius: @radius;
+  padding: @space-md;
+  margin-bottom: @space-sm;
+  font-size: @font-size-base;
+  line-height: 1.7;
+}
+
+.q-option-on {
+  border-color: @primary;
+  background: @primary-soft;
+}
+
+.q-input {
+  width: 100%;
+  min-height: 110px;
+  border: 1px solid @border;
+  border-radius: @radius;
+  padding: @space-md;
+  margin-bottom: @space-md;
+  font-size: @font-size-base;
+  line-height: 1.7;
+}
+
+.q-grading {
+  padding: @space-md 0;
+}
+
+.q-again {
+  margin-top: @space-xs;
+}
+
+.q-result {
+  margin-top: @space-md;
+  padding-top: @space-md;
+  border-top: 1px dashed @border;
+}
+
+.q-verdict-row {
+  display: flex;
+  align-items: baseline;
+  gap: @space-sm;
+  margin-bottom: @space-md;
+}
+
+.q-verdict {
+  font-size: @font-size-lg;
+  font-weight: 600;
+}
+
+.q-verdict-correct {
+  color: @success;
+}
+.q-verdict-partial {
+  color: @warning;
+}
+.q-verdict-off {
+  color: @danger;
+}
+
+.q-score {
+  font-size: @font-size-sm;
+  color: @text-secondary;
+}
+
+.q-block {
+  background: @bg-soft;
+  border-radius: @radius;
+  padding: @space-md;
+  margin-bottom: @space-sm;
+}
+
+.q-block-title {
+  display: block;
+  font-size: @font-size-sm;
+  color: @text-secondary;
+  margin-bottom: @space-xs;
+}
+
+.q-block-answer {
+  background: #fbfbfc;
+  border: 1px solid @border;
+}
+
+.q-block-key {
+  background: #f2f6fb;
+}
+
+.q-block-good {
+  background: #f0f7f2;
+}
+
+.q-block-bad {
+  background: #fdf3f2;
+}
+
+.q-block-takeaway {
+  background: #fdf8ec;
+}
+
+.q-item {
+  display: block;
+  font-size: @font-size-sm;
+  line-height: 1.7;
+  margin-bottom: @space-xs;
+}

@@ -1,0 +1,42 @@
+// 尺寸一律按 **375 设计稿的真实 CSS 像素** 写。
+//
+// Taro 的 designWidth 是 375，pxtransform 会把 px 换成 rem，运行时再按实际屏宽还原：
+// 写 15px，在 375 宽的屏上就是 15px，在 430 宽的屏上是 17px。
+// 所以别按 750 的稿子写双倍数值——那样字号会大一倍，一屏放不下几个字。
+// （call-front 也是这个口径：常用字号 12-16px。）
+
+// 字号
+@font-size-xs: 11px; // 角标、时间戳
+@font-size-sm: 12px; // 次要说明
+@font-size-base: 15px; // 正文
+@font-size-md: 16px; // 强调正文
+@font-size-lg: 17px; // 卡片标题
+@font-size-xl: 20px; // 页面主标题
+@font-size-xxl: 24px; // 大标题
+
+// 间距
+@space-xs: 4px;
+@space-sm: 8px;
+@space-md: 12px;
+@space-lg: 16px;
+@space-xl: 24px;
+
+// 圆角
+@radius-sm: 6px;
+@radius: 8px;
+@radius-lg: 12px;
+
+// 颜色
+@primary: #2b6cb0;
+@primary-soft: #ebf2fa;
+@text-primary: #1f2329;
+@text-secondary: #8a9099;
+@text-tertiary: #4a5058;
+@bg-page: #f5f6f8;
+@bg-card: #ffffff;
+@bg-soft: #f7f8fa;
+@line: #eef0f3;
+@border: #e5e7eb;
+@success: #2f855a;
+@warning: #b7791f;
+@danger: #c0392b;
