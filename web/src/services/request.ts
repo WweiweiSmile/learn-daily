@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import { clearSession, getAccessToken, getRefreshToken, saveTokens } from '../utils/authStorage';
-import { startSSO } from '../utils/sso';
+import { awaitPendingTicket, startSSO } from '../utils/sso';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -46,8 +46,22 @@ async function call<T>(
   url: string,
   options: RequestOptions,
   withCredentials: boolean,
+  waitForTicket = true,
 ): Promise<T> {
   const { method = 'GET', data, ...rest } = options;
+
+  // SSO 回程时先等票据落地再发。
+  //
+  // 这一发通常就是**落点页挂载时的首次加载**（比如 library 页 useDidShow 里的
+  // `listBooks`）：等下来它才能带上刚换到的令牌正常返回。不等的话它必然 401，
+  // 而 401 的处理（clearSession + 跳 SSO）会把这次登录整个冲掉 —— 正是
+  // TicketHandler 早先用"不渲染 children"去回避的那个问题（那个做法会让
+  // Taro 找不到页面实例，已废弃）。
+  //
+  // 没有票据在换时这是一个已 resolve 的 promise，等于空操作
+  if (waitForTicket) {
+    await awaitPendingTicket();
+  }
 
   const header: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -84,7 +98,9 @@ async function call<T>(
 
 /** 打认证中心。不带凭证 —— 换票、刷新都不需要 access token */
 export async function requestAuth<T>(url: string, options: RequestOptions = {}): Promise<T> {
-  return call<T>(`${AUTH_BASE_URL}${url}`, options, false);
+  // `waitForTicket = false`：**换票请求自己就是那张"待换的票"**，
+  // 让它去 await 自己就是死锁。续期同理不需要等（它只可能在票据落地之后发生）
+  return call<T>(`${AUTH_BASE_URL}${url}`, options, false, false);
 }
 
 /**

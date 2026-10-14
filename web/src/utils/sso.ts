@@ -38,6 +38,62 @@ export const CLIENT_ID = 'learn-daily';
 let navigating = false;
 
 /**
+ * 正在进行中的换票。
+ *
+ * 存在的理由是**"先别跳"**：SSO 回程时页面是真的挂载了的（票据处理不能
+ * 再靠"不渲染 children"把它挡住 —— 那会让 Taro 找不到页面实例，见
+ * components/TicketHandler.tsx），于是守卫和页面自己的请求都会在票据换完
+ * 之前跑起来，两边都会把这次登录冲掉：
+ *   - 守卫判定"未登录" → `startSSO()`，把回程地址整个替换掉
+ *   - 页面首个请求没带令牌 → 401 → 请求层也是 `clearSession()` + `startSSO()`
+ *
+ * 所以换票期间 `startSSO()` 必须直接返回（一处改动同时堵住上面两条路），
+ * 等它落地再按结果决定跳不跳（见 components/RequireAuth.tsx）。
+ *
+ * 请求层另外会 `awaitPendingTicket()` —— 那一等让页面首个请求能带着
+ * 刚换到的令牌发出去（见 services/request.ts）
+ */
+let ticketExchange: Promise<void> | null = null;
+
+/** 递增序号：落地时只清自己那一份，避免把后来登记的覆盖掉 */
+let exchangeSeq = 0;
+
+/**
+ * 登记一次换票。
+ *
+ * **必须在任何页面 effect 之前调用**，晚了页面已经跳走了 —— 调用点在
+ * components/TicketHandler.tsx 的渲染期（不是它的 effect 里）
+ */
+export function registerTicketExchange(exchange: Promise<void>): void {
+  const seq = ++exchangeSeq;
+  ticketExchange = exchange
+    // 成败都不关心：这里只回答"什么时候算结束"。失败由换票自己处理，
+    // 更不能让一个 rejected 的 promise 顺着 await 传到调用方去
+    .catch(() => {})
+    .then(() => {
+      if (exchangeSeq === seq) ticketExchange = null;
+    });
+}
+
+/**
+ * 等换票落地。没有票据在换时是一个已 resolve 的 promise，等于空操作。
+ *
+ * ⚠️ **换票请求自己不能走这里** —— 它就是 `ticketExchange` 本身，等它就是
+ * 自己等自己（见 services/request.ts 的 `waitForTicket`）
+ */
+export function awaitPendingTicket(): Promise<void> {
+  return ticketExchange ?? Promise.resolve();
+}
+
+/**
+ * 是否已经在跳转途中。换票成功后用它确认"用户没有在这期间点登出" ——
+ * 否则会把刚登出的会话又按回来（见 globalLogout）
+ */
+export function isNavigating(): boolean {
+  return navigating;
+}
+
+/**
  * 生成 state。
  *
  * 用 `crypto.getRandomValues` 而不是 `crypto.randomUUID()` —— 后者在
@@ -98,6 +154,9 @@ function sanitizeReturnTo(route: string): string {
  */
 export function startSSO(returnTo?: string): void {
   if (navigating) return;
+  // 换票期间不许跳：这一跳会把回程地址（连着票据）整个替换掉，
+  // 这次登录就白跑了。守卫和请求层的 401 都会走到这里，一处堵住两条路
+  if (ticketExchange) return;
   if (typeof window === 'undefined' || !AUTH_ORIGIN) return;
   navigating = true;
 
