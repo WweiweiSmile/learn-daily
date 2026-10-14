@@ -29,15 +29,20 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="learn-daily", lifespan=lifespan)
 
-# 认证走 Bearer token（不用 cookie），所以 allow_origins 可以是配置里的白名单。
-# 留空表示不限 —— 只适合本地开发
-_origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+def _csv(value: str) -> list[str]:
+    """把 "a, b ,c" 拆成 ["a", "b", "c"]，顺带丢掉空项"""
+    return [v.strip() for v in value.split(",") if v.strip()]
+
+
+# CORS 全从 .env 读（见 config.py 的 cors_* 三项），改白名单不用动代码。
+# 认证走 Bearer token（不用 cookie），所以来源用白名单而不是全放行。
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_origins or ["*"],
-    allow_methods=["*"],
-    # Authorization 必须显式允许，否则浏览器会在预检里拒掉带 token 的请求
-    allow_headers=["Authorization", "Content-Type"],
+    allow_origins=_csv(settings.cors_origins) or ["*"],
+    # 方法默认 "*" 就含 OPTIONS，跨域预检才会通过
+    allow_methods=_csv(settings.cors_allow_methods) or ["*"],
+    # Authorization 必须在允许头里，否则带 token 的跨域请求会在预检被拒
+    allow_headers=_csv(settings.cors_allow_headers) or ["*"],
 )
 
 app.include_router(books.router, prefix="/api/v1")

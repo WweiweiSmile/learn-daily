@@ -40,8 +40,16 @@ class Settings(BaseSettings):
     data_dir: Path = BASE_DIR / "data"
 
     # ---- CORS ----
-    # 逗号分隔。为空表示不限制（仅本地开发可接受）
+    # 允许的前端源，逗号分隔。默认 "*" = 不限来源；生产请在 .env 里填具体源。
+    # 生产是跨域的：前端 http://learn.qwnet.top 打后端 http://learn-back.qwnet.top
     cors_origins: str = ""
+
+    # 允许的请求方法，逗号分隔。"*" 表示不限，**含 OPTIONS** —— 跨域预检靠它放行
+    cors_allow_methods: str = "*"
+
+    # 允许的请求头，逗号分隔。Authorization 必须在里面，否则带 token 的跨域请求
+    # 会在预检这一步就被浏览器拒掉
+    cors_allow_headers: str = "Authorization,Content-Type"
 
     # ---- 按天切分 ----
     # 一天的目标字数。到了这个量就切一天。
