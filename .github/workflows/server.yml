@@ -4,6 +4,16 @@
 # 用同一套 secrets 名字（SERVER_HOST / SERVER_USERNAME / SERVER_PASSWORD）。
 # Python 这边的"装依赖"与"找服务"两段参考 poker-ocr 的 python.yml —— 一个裸的
 # systemctl restart 只会换成代码、不装新依赖，加了包的那次上线会在服务器上直接崩。
+# 服务器已预装 uv（本项目用它管依赖与 .venv），流水线里直接调用，不再做存在性检查。
+#
+# 服务器上的服务由 systemd 拉起，命令等同：
+#     uv run uvicorn app.main:app --reload --port 8010
+# 这带来两点，决定了下面的写法：
+#   * `uv run` 启动时会自己 sync 依赖 —— 所以"装依赖"那步严格说可以省。这里仍然保留，
+#     是为了在**重启之前**就把它装好：装失败时 set -e 当场退出，线上还是旧版在跑，
+#     而不是把服务重启到一半才发现依赖是坏的、直接掉线。
+#   * `--reload` 只覆盖 app/ 里的代码变动；依赖变了、或服务本来就 failed 的场景仍得靠
+#     重启。所以这里照常 restart，不赌 reloader 一定会触发。
 #
 # 刻意不跑 test，与 call-back / call-front 一致：这条流水线只负责"把代码送上线"。
 # 代价要知道：它只能证明"传上去了"，证明不了行为正确 —— 好在 server 的 37 个测试
@@ -53,7 +63,6 @@ jobs:
       - name: 部署
         uses: appleboy/ssh-action@v1.2.0
         with:
-          debug: true
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
@@ -62,13 +71,13 @@ jobs:
             set -e
             cd /www/wwwroot/learn-back
 
-            # ── 1. uv：本项目用 uv 管理依赖与 .venv ──────────────────────
-            if ! command -v uv >/dev/null 2>&1; then
-              echo "❌ 服务器上没有 uv。先装一次：curl -LsSf https://astral.sh/uv/install.sh | sh"
-              exit 1
-            fi
+            # uv 已预装，直接用。非交互式 SSH 不读 profile，官方安装脚本默认落在
+            # ~/.local/bin，补进 PATH 免得 "uv: command not found"
+            export PATH="$HOME/.local/bin:$PATH"
 
-            # ── 2. 依赖：uv.lock 没变就跳过 uv sync ─────────────────────
+            # ── 1. 依赖：uv.lock 没变就跳过 uv sync ─────────────────────
+            # 服务是 `uv run` 起的、启动时也会 sync，但那发生在重启之后；先在这里装
+            # 一次，失败就地退出，线上保持旧版。
             STAMP=.uv.sha256
             NEW=$(sha256sum uv.lock | awk '{print $1}')
 
@@ -81,7 +90,7 @@ jobs:
               echo "$NEW" > "$STAMP"   # 装成功才落盘，失败了下一次还会重试
             fi
 
-            # ── 3. 找服务：先按端口 8010 反查，反查不到再按名字 ──────────
+            # ── 2. 找服务：先按端口 8010 反查，反查不到再按名字 ──────────
             # 按名字找不可靠：unit 叫什么全看宝塔怎么命名；而且服务处于 failed 状态时
             # list-units 会在行首多打一个 ●，被 awk 当成第一个字段，grep 就匹配不到了。
             # 服务在跑的时候端口一定是通的，从端口反查最稳。
@@ -93,6 +102,16 @@ jobs:
               SVC=$(grep -oE '[^/]+\.service' "/proc/$PID/cgroup" 2>/dev/null | head -n1 || true)
             fi
 
+            # 反查到的 unit 可能是"共用"的：宝塔「进程守护管理器」把服务器上所有程序都
+            # 挂在同一个 supervisord.service 下，restart 它会把别的应用一起重启。
+            # 这种宁可当没查到，交给下面的兜底，也别去动它。
+            case "$SVC" in
+              supervisord.service|bt.service)
+                echo "⚠️  8010 跑在共用 unit $SVC 下，重启它会波及别的应用，按未找到处理"
+                SVC=""
+                ;;
+            esac
+
             if [ -z "$SVC" ]; then
               # 服务没在跑（端口空）时兜底：按名字找，并剥掉行首的 ● 和空格
               SVC=$(systemctl list-units --type=service --all --plain --no-legend --no-pager 2>/dev/null \
@@ -100,15 +119,35 @@ jobs:
                     | grep -iE 'learn' | head -n1 || true)
             fi
 
-            # ── 4. 重启并确认真的起来了 ────────────────────────────────
+            # ── 3. 重启，并确认真的能用（不只是"起来了"）────────────────
             if [ -n "$SVC" ]; then
               # 反复 boot 失败会把 unit 打成 failed 并触发 systemd 的启动限流，
               # 这时 restart 会被直接拒掉，所以先清一次失败状态
               systemctl reset-failed "$SVC" 2>/dev/null || true
               systemctl restart "$SVC"
-              sleep 3
-              systemctl is-active "$SVC"
-              echo "✅ 已重启 $SVC"
+
+              # unit 是 active 只说明进程在，说明不了它在收请求（--reload 起的那套尤其
+              # 如此）—— 所以直接轮询 /health，通了才算部署成功；没装 curl 就退回旧法。
+              ok=""
+              if command -v curl >/dev/null 2>&1; then
+                for _ in $(seq 1 15); do
+                  if curl -fsS -o /dev/null "http://127.0.0.1:8010/health" 2>/dev/null; then
+                    ok=1
+                    break
+                  fi
+                  sleep 1
+                done
+              else
+                sleep 3
+                systemctl is-active "$SVC" && ok=1
+              fi
+
+              if [ -z "$ok" ]; then
+                echo "❌ $SVC 重启后 /health 打不通，最后 20 行状态如下："
+                systemctl status "$SVC" --no-pager -l | tail -n 20 || true
+                exit 1
+              fi
+              echo "✅ 已重启 $SVC，/health 正常"
             else
               echo "⚠️  没找到服务名，跳过重启。依赖已处理好，去面板手动重启一次即可。"
             fi
