@@ -1,4 +1,5 @@
-import { BASE_URL, request } from './request';
+import { BASE_URL, refreshAccessToken, request } from './request';
+import { getAccessToken } from '../utils/authStorage';
 import type { Attempt, Book, BookDetail, DayDetail, DaySummary, Diagnosis } from '../models/types';
 
 export const api = {
@@ -66,13 +67,33 @@ export function pickPdf(): Promise<PickedFile | null> {
  *
  * 走原生 fetch 而不是 Taro.uploadFile：H5 端 uploadFile 在 4xx/5xx 时也走 success，
  * 状态码还得自己判，而且它要的是 filePath 不是 File，绕一圈没必要。
+ *
+ * 代价是**绕开了 request()，token 得自己加**：后端这个端点是 Requires 登录的，
+ * 漏掉 Authorization 就是那句 401「登录态已失效」——而且看起来像"登录坏了"，
+ * 其实只是这一个请求没带头。Content-Type 交给 fetch 自己带（multipart 的
+ * boundary 只有它知道），别手写。
  */
 export async function uploadPdf(source: PickedFile, title: string): Promise<Book> {
   const form = new FormData();
   form.append('file', source.file, source.name);
   form.append('title', title);
 
-  const response = await fetch(`${BASE_URL}/books/pdf`, { method: 'POST', body: form });
+  const send = () => {
+    const token = getAccessToken();
+    return fetch(`${BASE_URL}/books/pdf`, {
+      method: 'POST',
+      body: form,
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+  };
+
+  let response = await send();
+  // 与 request() 一致：access token 只有 15 分钟，撞上过期先静默续期再重放一次
+  // （FormData 可以重复发，不像流那样发过就废）
+  if (response.status === 401) {
+    const fresh = await refreshAccessToken().catch(() => null);
+    if (fresh) response = await send();
+  }
   if (!response.ok) {
     let detail = '';
     try {

@@ -14,7 +14,10 @@ from app.views import book_detail, book_read, book_reads
 
 router = APIRouter(tags=["books"])
 
-MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+# 上传上限。改这里的同时记得同步 nginx 的 client_max_body_size —— 它默认才 1m，
+# 不放大的话 200MB 的包会先被 nginx 用 413 挡掉，根本走不到这个检查
+MAX_UPLOAD_MB = 200
+MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024
 
 
 def _require_book(session: Session, book_id: int) -> Book:
@@ -36,7 +39,7 @@ def upload_pdf(
     if not data:
         raise HTTPException(status_code=400, detail="文件是空的")
     if len(data) > MAX_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="文件太大，上限 50MB")
+        raise HTTPException(status_code=413, detail=f"文件太大，上限 {MAX_UPLOAD_MB}MB")
     book = create_book_from_pdf(
         session,
         user_id=user.id,
