@@ -83,8 +83,8 @@ async def run_lesson(user_id: int, lesson_id: int, day_id: int) -> None:
                 book_title=book.title if book else "这本书",
                 day_title=day.title,
                 content=day_text(sections),
-                min_chars=max(400, char_count // 12),
-                max_chars=max(900, char_count // 6),
+                min_chars=max(800, char_count // 5),
+                max_chars=max(2000, char_count * 2 // 5),
             )
 
     if message is None:
